@@ -36,3 +36,7 @@ Stream Deck Taste → Handy (STT) → `handy-tool.sh` → Text wird ins aktive F
 - `wl-copy` (aus `wl-clipboard`) — Clipboard-Zugriff unter Wayland
 - `ydotool` + `ydotoold` — Tastatur-Simulation (muss als root laufen)
 - `qdbus6` — KWin-Scripting für Terminal-Erkennung
+
+## Lizenz
+
+[EUPL 1.2](./LICENSE)
