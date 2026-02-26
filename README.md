@@ -11,11 +11,13 @@ In OpenDeck pro Taste eine "Run command"-Action auf "Key down" konfigurieren.
 | Script | Beschreibung | Icon |
 |--------|-------------|------|
 | `firefox.sh` | Startet Firefox oder bringt ihn in den Vordergrund | `/usr/share/icons/hicolor/128x128/apps/firefox.png` |
+| `edge.sh` | Startet Edge oder bringt ihn in den Vordergrund | `/usr/share/icons/hicolor/256x256/apps/microsoft-edge.png` |
 | `handy-tool.sh` | Paste-Helper für [Handy](https://handy.computer) Speech-to-Text — nimmt transkribierten Text entgegen und fügt ihn per Clipboard ins aktive Fenster ein | `microphone.png` |
 
 ## Helfer
 
-- `kwin-focus.sh <window-class>` — Bringt ein Fenster per KWin-Scripting (DBus) in den Vordergrund. Wird von den App-Scripts genutzt und funktioniert unter Wayland.
+- `app-launch.sh <process-name> <window-class> <start-command>` — Generischer App-Launcher: prüft ob der Prozess läuft und fokussiert ihn, andernfalls wird die App gestartet. Wird von `firefox.sh`, `edge.sh` etc. genutzt.
+- `kwin-focus.sh <window-class>` — Bringt ein Fenster per KWin-Scripting (DBus) in den Vordergrund. Wird von `app-launch.sh` genutzt und funktioniert unter Wayland.
 
 ## Speech-to-Text via Stream Deck
 
