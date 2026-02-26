@@ -12,7 +12,20 @@ In OpenDeck pro Taste eine "Run command"-Action auf "Key down" konfigurieren.
 |--------|-------------|------|
 | `firefox.sh` | Startet Firefox oder bringt ihn in den Vordergrund | `/usr/share/icons/hicolor/128x128/apps/firefox.png` |
 | `edge.sh` | Startet Edge oder bringt ihn in den Vordergrund | `/usr/share/icons/hicolor/256x256/apps/microsoft-edge.png` |
+| `konsole-quake-toggle.sh` | Konsole im Quake-Stil: öffnet als randloses Dropdown von oben, toggled Sichtbarkeit per Stream Deck Taste | `konsole-quake.png` |
 | `handy-tool.sh` | Paste-Helper für [Handy](https://handy.computer) Speech-to-Text — nimmt transkribierten Text entgegen und fügt ihn per Clipboard ins aktive Fenster ein | `microphone.png` |
+
+## Konsole-Konfiguration
+
+Die Dateien in `konsole-config/` entfernen beide Konsole-Toolbars (Main Toolbar und Session Toolbar) über KDE XML-GUI-Overrides. Ohne diese Overrides greift die `konsolerc`-Einstellung `IsHidden=true` bei Konsole nicht, weil die Toolbars als Qt-Ressourcen in die Binary kompiliert sind.
+
+Installation:
+
+```bash
+./install-konsole-config.sh
+```
+
+Danach Konsole neu starten. Existierende Dateien werden als `.bak` gesichert.
 
 ## Helfer
 
