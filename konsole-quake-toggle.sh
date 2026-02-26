@@ -6,6 +6,8 @@
 # auf Title-Matching reagieren (Timing-Problem).
 
 PIDFILE="/tmp/konsole-quake.pid"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+STATE_FILE="$HOME/.local/state/konsole-quake-session.json"
 
 run_kwin_script() {
     local tmpscript
@@ -22,13 +24,22 @@ is_running() {
     [[ -f "$PIDFILE" ]] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null
 }
 
-# Wenn Konsole-Quake nicht läuft: starten mit Default-Layout
+# Wenn Konsole-Quake nicht läuft: starten und State wiederherstellen
 if ! is_running; then
     unset CLAUDECODE
-    konsole --separate \
-            --tabs-from-file ~/.config/konsole-quake-tabs \
-            --profile Quake \
-            --hide-menubar &
+
+    if [[ -f "$STATE_FILE" ]]; then
+        # State vorhanden: Konsole minimal starten, dann per D-Bus wiederherstellen
+        konsole --separate \
+                --profile Quake \
+                --hide-menubar &
+    else
+        # Kein State: Fallback auf statische Tab-Datei
+        konsole --separate \
+                --tabs-from-file ~/.config/konsole-quake-tabs \
+                --profile Quake \
+                --hide-menubar &
+    fi
     echo $! > "$PIDFILE"
 
     # Warten bis das Fenster erscheint, dann Window-Rules anwenden
@@ -51,10 +62,19 @@ if ! is_running; then
     }
 })();
 "
+    # State wiederherstellen (im Hintergrund, nach Window-Rules)
+    # Extra Wartezeit damit Konsole vollständig initialisiert ist
+    if [[ -f "$STATE_FILE" ]]; then
+        (sleep 1 && python3 "$SCRIPT_DIR/konsole-quake-session.py" restore "$PID" 2>/dev/null) &
+    fi
+
     exit 0
 fi
 
 PID=$(cat "$PIDFILE")
+
+# State speichern bei jedem Toggle (schneller D-Bus-Call)
+python3 "$SCRIPT_DIR/konsole-quake-session.py" save 2>/dev/null || true
 
 # Toggle: minimize/focus
 run_kwin_script "
