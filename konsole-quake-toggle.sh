@@ -56,7 +56,8 @@ if ! is_running; then
             w.skipTaskbar = true;
             w.skipPager = true;
             w.skipSwitcher = true;
-            w.frameGeometry = {x: 1707, y: 0, width: 2560, height: 1087};
+            var sg = workspace.activeScreen.geometry;
+            w.frameGeometry = {x: sg.x, y: sg.y, width: sg.width, height: Math.round(sg.height * 0.755)};
             break;
         }
     }
@@ -84,6 +85,22 @@ run_kwin_script "
         var w = windows[i];
         if (w.pid === ${PID}) {
             if (w.minimized || workspace.activeWindow !== w) {
+                // Prüfen ob Fenster auf einem sichtbaren Screen liegt
+                var visible = false;
+                var screens = workspace.screens;
+                var fg = w.frameGeometry;
+                for (var s = 0; s < screens.length; s++) {
+                    var sg = screens[s].geometry;
+                    if (fg.x < sg.x + sg.width && fg.x + fg.width > sg.x &&
+                        fg.y < sg.y + sg.height && fg.y + fg.height > sg.y) {
+                        visible = true;
+                        break;
+                    }
+                }
+                if (!visible) {
+                    var ag = workspace.activeScreen.geometry;
+                    w.frameGeometry = {x: ag.x, y: ag.y, width: ag.width, height: Math.round(ag.height * 0.755)};
+                }
                 w.minimized = false;
                 workspace.activeWindow = w;
             } else {
