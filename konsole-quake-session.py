@@ -189,6 +189,8 @@ def do_save():
                                 "org.kde.konsole.Window.defaultProfile", check=False)
             except Exception:
                 profile = ""
+        if not profile or profile == "Integriert":
+            profile = "Quake"
 
         # Baum parsen
         split_node, view_counter = parse_split_content(
@@ -261,7 +263,7 @@ def get_first_cwd(node):
     return get_first_cwd(node["children"][0])
 
 
-def restore_node(node, current_view, current_sid, tab_title, service, window):
+def restore_node(node, current_view, current_sid, tab_title, service, window, profile="Quake"):
     """Rekursive Split-Wiederherstellung. Keine bash-Scoping-Probleme mehr."""
     if "cwd" in node:
         # Leaf: cwd setzen
@@ -310,13 +312,20 @@ def restore_node(node, current_view, current_sid, tab_title, service, window):
         new_sid = new_sids.pop() if new_sids else ""
         new_view = new_views.pop() if new_views else ""
 
+        if new_sid:
+            try:
+                qdbus(service, f"/Sessions/{new_sid}",
+                      "org.kde.konsole.Session.setProfile", profile, check=False)
+            except Exception:
+                pass
+
         child_infos.append((new_view, new_sid))
 
     # DANN rekursiv in alle Kinder — Python hat echtes Scoping, kein Clobbering
     for i, child in enumerate(children):
         view_id, sid = child_infos[i]
         if view_id and sid:
-            restore_node(child, view_id, sid, tab_title, service, window)
+            restore_node(child, view_id, sid, tab_title, service, window, profile)
 
 
 def do_restore(konsole_pid):
@@ -406,7 +415,7 @@ def do_restore(konsole_pid):
             view_ids = re.findall(r"\d+", clean)
             new_view = view_ids[0] if view_ids else "0"
 
-            restore_node(split, new_view, new_sid, title, service, window)
+            restore_node(split, new_view, new_sid, title, service, window, profile)
 
     # Initiale Default-Session schließen
     if initial_session and created_sessions:
