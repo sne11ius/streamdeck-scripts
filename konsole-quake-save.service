@@ -1,12 +1,14 @@
 [Unit]
-Description=Save Konsole-Quake session state before shutdown
-DefaultDependencies=no
-Before=shutdown.target reboot.target halt.target
+Description=Best-effort save of Konsole-Quake state when the graphical session stops
+After=graphical-session.target
+PartOf=graphical-session.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c 'if [ -f /tmp/konsole-quake.pid ] && kill -0 "$(cat /tmp/konsole-quake.pid)" 2>/dev/null; then python3 @SCRIPT_DIR@/konsole-quake-session.py save; fi'
-TimeoutStartSec=10
+RemainAfterExit=yes
+ExecStart=/usr/bin/true
+ExecStop=/bin/bash -c 'if [ -f /tmp/konsole-quake.pid ]; then /usr/bin/python3 "@SCRIPT_DIR@/konsole-quake-session.py" save; fi'
+TimeoutStopSec=30
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target
